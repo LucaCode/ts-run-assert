@@ -1,0 +1,50 @@
+{
+  "name": "ts-run-assert",
+  "version": "0.2.0",
+  "description": "Typescript runtime type assertion. Works with a transformer that compiles structure information into the javascript code.",
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts",
+  "scripts": {
+    "build": "rimraf lib/ && ttsc --project tsconfig.json",
+    "test": "ttsc --project tsconfig-test.json && jest",
+    "prepare": "npm run build"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/LucaCode/ts-run-assert.git"
+  },
+  "author": {
+    "name": "Luca Scarignella",
+    "email": "lucacode1@gmail.com",
+    "url": "https://luca.scaringella.de"
+  },
+  "files": [
+    "lib/**/*"
+  ],
+  "license": "MIT",
+  "keywords": [
+    "esay",
+    "validation",
+    "runtime",
+    "types",
+    "checking",
+    "assert",
+    "assertion",
+    "typescript",
+    "transformer",
+    "javascript",
+    "typeinformation",
+    "tool"
+  ],
+  "devDependencies": {
+    "@types/jest": "^25.1.3",
+    "@types/node": "^13.7.7",
+    "jest": "^25.1.0",
+    "ts-jest": "^25.2.1",
+    "typescript": "^3.8.3",
+    "ttypescript": "^1.5.10",
+    "rimraf": "^3.0.0",
+    "ts-nameof": "4.2.2",
+    "ts-node": "^8.7.0"
+  }
+}

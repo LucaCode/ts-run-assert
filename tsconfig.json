@@ -1,0 +1,28 @@
+{
+  "compilerOptions": {
+    "target": "es6",
+    "module": "commonjs",
+    "lib": ["es2015", "es2016", "es2017", "dom"],
+    "suppressImplicitAnyIndexErrors": true,
+    "noEmitOnError": true,
+    "allowJs": true,
+    "strict": true,
+    "declaration": true,
+    "noImplicitReturns": true,
+    "esModuleInterop": true,
+    "downlevelIteration": true,
+    "rootDir": "src",
+    "outDir": "lib",
+    "plugins": [{
+        "transform": "ts-nameof",
+        "type": "raw"
+    }
+    ]
+  },
+  "include": [
+    "src"
+  ],
+  "exclude": [
+    "node_modules"
+  ]
+}

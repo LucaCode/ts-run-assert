@@ -1,0 +1,7 @@
+.idea
+node_modules
+lib
+**/*.js
+!test/index.js
+!jest.config.js
+.DS_STORE

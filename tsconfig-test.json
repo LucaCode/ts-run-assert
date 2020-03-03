@@ -1,0 +1,26 @@
+{
+  "compilerOptions": {
+    "target": "es6",
+    "module": "commonjs",
+    "lib": ["es2015", "es2016", "es2017", "dom"],
+    "suppressImplicitAnyIndexErrors": true,
+    "noEmitOnError": true,
+    "allowJs": true,
+    "strict": true,
+    "noImplicitReturns": true,
+    "esModuleInterop": true,
+    "downlevelIteration": true,
+    "declaration": false,
+    "plugins": [
+      {
+        "transform": "./lib/transformer.js"
+      }
+    ]
+  },
+  "include": [
+    "test"
+  ],
+  "exclude": [
+    "node_modules"
+  ]
+}
