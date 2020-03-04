@@ -77,6 +77,10 @@ export default class StructureParser {
         else if(ts.isTypeReferenceNode(node)) {
             expression = this.parseTypeReferenceNode(node,rememberIdentifiers,path);
         }
+        else if(ts.isTypeLiteralNode(node)) {
+            expression = this.parseObjectType(this.typeChecker.getTypeFromTypeNode(node),
+                'Anonymous',rememberIdentifiers,path);
+        }
         else {
             expression = this.parseValueTypes(node);
         }
@@ -105,10 +109,7 @@ export default class StructureParser {
     {
         const type = this.typeChecker.getTypeFromTypeNode(node);
         if(type.isClassOrInterface()) {
-            const identifier = this.declareVariable(type);
-            this.initVariable(identifier,
-                this.parseObject(type,node.typeName.getText(),identifier,[...rememberIdentifiers,identifier],path));
-            return identifier;
+            return this.parseObjectType(type,node.typeName.getText(),rememberIdentifiers,path)
         }
         else {
             const symbol = this.typeChecker.getSymbolAtLocation(node.typeName);
@@ -210,7 +211,10 @@ export default class StructureParser {
         ]);
     }
 
-    private parseObject(type: ts.Type,name: string,selfIdentifier: ts.Identifier,rememberIdentifiers: ts.Identifier[],path: string[]): ts.ObjectLiteralExpression {
+    private parseObjectType(type: ts.Type,name: string,rememberIdentifiers: ts.Identifier[],path: string[]): ts.Identifier {
+        const selfIdentifier = this.declareVariable(type);
+        rememberIdentifiers = [...rememberIdentifiers,selfIdentifier];
+
         const props = type.getProperties();
         const propertiesStructure: ts.PropertyAssignment[] = [];
 
@@ -299,13 +303,15 @@ export default class StructureParser {
             }
         });
 
-        return ts.createObjectLiteral([
+        const res = ts.createObjectLiteral([
             ts.createPropertyAssignment(nameof<Token>(s => s.t),ts.createNumericLiteral(TokenType.Object.toString())),
             ts.createPropertyAssignment(nameof<Token>(s => s.v),ts.createObjectLiteral([
                 ts.createPropertyAssignment(nameof<Object>(s => s.n),ts.createStringLiteral(name)),
                 ts.createPropertyAssignment(nameof<Object>(s => s.p),ts.createObjectLiteral(propertiesStructure))
             ]))
         ]);
+        this.initVariable(selfIdentifier,res);
+        return selfIdentifier;
     }
 
     // noinspection JSMethodCanBeStatic
