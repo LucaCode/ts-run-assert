@@ -118,13 +118,12 @@ export default class Visitor {
                 // noinspection ExceptionCaughtLocallyJS
                 throw new Error("Assert function needs a type argument.");
             }
-            if((node.arguments && node.arguments.length !== 1)){
+            if((node.arguments && node.arguments.length < 1)){
                 // noinspection ExceptionCaughtLocallyJS
-                throw new Error("Assert function needs one argument.")
+                throw new Error("Assert function needs at least one argument.")
             }
 
             const oldIdentifier = node.expression;
-            const dataArg = node.arguments[0];
 
             if(oldIdentifier.kind === ts.SyntaxKind.Identifier){
                 const structureIdentifier = this.getTypeStructureId(node.typeArguments[0]);
@@ -133,7 +132,7 @@ export default class Visitor {
                     node.expression as ts.Identifier,
                     ts.createIdentifier(runKey)
                 ),[],
-                    [ts.createStringLiteral(structureIdentifier),dataArg]);
+                    [ts.createStringLiteral(structureIdentifier),...node.arguments]);
             }
             else {
                 // noinspection ExceptionCaughtLocallyJS

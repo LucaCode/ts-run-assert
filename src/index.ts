@@ -12,15 +12,17 @@ import {default as assertRun} from "./runner/assertRun";
 import {default as structureRun} from "./runner/structureRun";
 import {runKey} from "./runner/key";
 import {ValidationErrorType} from "./validation/validationErrorType";
+import {CircularDependencyLimitReachedError} from "./validation/circularDependencyLimitReachedError";
 
 export function structure<T>(): Structure {throw new Error(`Use the ts-run-assert transformer.`)}
 structure[runKey] = structureRun;
 
-export function assert<T>(value: any): asserts value is T {throw new Error(`Use the ts-run-assert transformer.`)}
+export function assert<T>(value: any, circularDependencyLimit: number = 10): asserts value is T {throw new Error(`Use the ts-run-assert transformer.`)}
 assert[runKey] = assertRun;
 export {
     createValidator,
     TypeAssertionError,
     Structure,
-    ValidationErrorType
+    ValidationErrorType,
+    CircularDependencyLimitReachedError
 }
