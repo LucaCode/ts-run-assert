@@ -11,17 +11,14 @@ import {Structure} from "./structure/structure";
 const structureMap: Map<string,Structure> = new Map<string, Structure>();
 const validatorMap: Map<string,Validator> = new Map<string, Validator>();
 
-export interface StructurePackage {
-    i: string,
-    s: Structure
-}
-
-export default function register(...structures: StructurePackage[]) {
-    let structurePackage: StructurePackage;
-    for(let i = 0; i < structures.length; i++) {
-        structurePackage = structures[i];
-        structureMap.set(structurePackage.i,structurePackage.s);
-        validatorMap.set(structurePackage.i,createValidator(structurePackage.s));
+export default function register(parsedStructures: Record<string, Structure>) {
+    let structure: Structure;
+    for(let k in parsedStructures) {
+        if(parsedStructures.hasOwnProperty(k)) {
+            structure = parsedStructures[k];
+            structureMap.set(k,structure);
+            validatorMap.set(k,createValidator(structure));
+        }
     }
 }
 

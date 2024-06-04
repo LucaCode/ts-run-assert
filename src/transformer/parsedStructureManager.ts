@@ -5,13 +5,12 @@ Copyright(c) Luca Scaringella
  */
 
 import * as ts from 'typescript';
-import {StructurePackage} from "../register";
 
 export default class ParsedStructureManager {
 
     private structureId: number = 0;
 
-    private readonly idMap: Map<string,ts.CallExpression> = new Map();
+    private readonly idMap: Map<string,ts.Identifier | ts.ObjectLiteralExpression> = new Map();
     private readonly typeIdMap: Map<ts.Node | ts.Type,string> = new Map();
 
     getParsedStructureId(key: ts.Node | ts.Type): string | undefined {
@@ -22,22 +21,19 @@ export default class ParsedStructureManager {
         return undefined;
     }
 
-    registerParsedStructure(fromType: ts.Node | ts.Type,parsedStructure: ts.CallExpression): string {
+    registerParsedStructure(fromType: ts.Node | ts.Type,root: ts.Identifier | ts.ObjectLiteralExpression): string {
         const key = this.structureId.toString();
-        this.idMap.set(key,parsedStructure);
+        this.idMap.set(key,root);
         this.typeIdMap.set(fromType,key);
         this.structureId++;
         return key;
     }
 
-    getStructurePackagesArgs(): ts.ObjectLiteralExpression[] {
-        const structures: ts.ObjectLiteralExpression[] = [];
-        for (let [id, callExpression] of this.idMap.entries()) {
-            structures.push(ts.createObjectLiteral([
-                ts.createPropertyAssignment(nameof<StructurePackage>(s => s.i),ts.createStringLiteral(id)),
-                ts.createPropertyAssignment(nameof<StructurePackage>(s => s.s),callExpression)
-            ]));
+    getStructurePackagesArgument(): ts.ObjectLiteralExpression {
+        const props: ts.PropertyAssignment[] = [];
+        for (let [key, value] of this.idMap) {
+            props.push(ts.createPropertyAssignment(key,value));
         }
-        return structures;
+        return ts.createObjectLiteral(props);
     }
 }

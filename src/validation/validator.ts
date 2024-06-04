@@ -5,7 +5,8 @@ Copyright(c) Luca Scaringella
  */
 
 import {
-    ArrayToken, EnumToken,
+    ArrayToken,
+    EnumToken,
     IntersectionToken,
     LiteralToken,
     Object,
@@ -179,14 +180,71 @@ class ValidatorCreator {
             }};
     }
 
+    private createDeepObjectTokenIntersection(tokens: Token[]): Token[] {
+        const result: Token[] = [];
+        const innerObjectPropsMap: Record<string,Token[]> = {};
+        const names: string[] = [];
+
+        let token;
+        let props;
+        for(let i = 0; i < tokens.length; i++) {
+            token = tokens[i];
+            if(token.t === TokenType.Object) {
+                props = token.v.p;
+                for(let k in props){
+                    if(props.hasOwnProperty(k)){
+                        if(!innerObjectPropsMap.hasOwnProperty(k)){
+                            innerObjectPropsMap[k] = [];
+                        }
+                        innerObjectPropsMap[k].push(props[k]);
+                    }
+                }
+                names.push(token.v.n);
+            }
+            else {
+                result.push(token);
+            }
+        }
+
+
+        const combinedPropsToken: Record<string,Token> = {};
+        let propTokens;
+        for(let k in innerObjectPropsMap) {
+            if(innerObjectPropsMap.hasOwnProperty(k)) {
+                propTokens = innerObjectPropsMap[k];
+                combinedPropsToken[k] = {
+                    t: TokenType.Intersection,
+                    v: this.createDeepObjectTokenIntersection(propTokens)
+                };
+            }
+        }
+
+        result.push({
+            t: TokenType.Object,
+            v: {
+                n: names.join(' & '),
+                p: {}
+            }
+        });
+        return result;
+    }
+
     private createIntersectionValidator(token: IntersectionToken): InternalValidatorWrapper {
         const innerTokens = token.v;
         const tokenLength = innerTokens.length;
         const tokenValidators: InternalValidatorWrapper[] = [];
 
+        const objectTokens: ObjectToken[] = [];
+
         for(let i = 0; i < tokenLength; i++) {
-            tokenValidators[i] = this.createTokenValidator(innerTokens[i]);
+            if(innerTokens[i].t === TokenType.Object) {
+                objectTokens.push(innerTokens[i] as ObjectToken);
+            }
+            else {
+                tokenValidators[i] = this.createTokenValidator(innerTokens[i]);
+            }
         }
+        tokenValidators.push(this.createDeepCombinedObjectValidator(objectTokens));
 
         return {run: (value, path,errors,circularRunMemory) => {
             for(let i = 0; i < tokenLength; i++) {

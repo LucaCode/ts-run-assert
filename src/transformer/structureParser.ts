@@ -20,20 +20,14 @@ export default class StructureParser {
         this.typeChecker = program.getTypeChecker();
     }
 
-    public parse(node: ts.TypeNode): ts.CallExpression {
+    public parse(node: ts.TypeNode): ts.Identifier | ts.ObjectLiteralExpression {
         //reset
-        this.cacheVarId = 0;
-        this.declaredVariableCache = new Map();
-        this.variables = [];
         this.cycleDependencies = [];
+        return this.parseTypeNode(node,[],['Base']);
+    }
 
-        const parsed = this.parseTypeNode(node,[],['Base']);
-
-        return ts.createImmediatelyInvokedArrowFunction([
-            ...this.variables,
-            ...this.cycleDependencies,
-            ts.createReturn(parsed)
-        ]);
+    get statements(): ts.Statement[] {
+        return [...this.variables,...this.cycleDependencies];
     }
 
     private declareVariable(node: ts.TypeNode | ts.Type): ts.Identifier {

@@ -48,7 +48,10 @@ export default class Visitor {
                     ts.createIdentifier('require'),[],[
                         ts.createStringLiteral(registerJs)
                     ]),ts.createIdentifier('default'))
-                    ,[],[...visitor.parsedStructureManager.getStructurePackagesArgs()])
+                    ,[],[ts.createImmediatelyInvokedArrowFunction(
+                        [...visitor.structureParser.statements,
+                            ts.createReturn(visitor.parsedStructureManager.getStructurePackagesArgument())]
+                    )])
             )
             ,...sourceFile.statements]);
 
